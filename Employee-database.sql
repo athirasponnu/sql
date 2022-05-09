@@ -1,6 +1,6 @@
 create table department (dep_id  integer primary key,dep_name varchar(20),dep_location varchar(15));
 create table salary_grade (grade integer primary key ,min_salary integer ,max_salary integer );
-create table employees (emp_id integer, emp_name varchar(15),job_name varchar(10),
+create table employees (emp_id integer primary key, emp_name varchar(15),job_name varchar(10),
 manager_id integer,hire_date date,salary decimal(10,2),commission decimal(7,2),dep_id integer);
 insert into employees values(68319,"KAYLING","PRESIDENT",null,"1991-11-18",6000.00,null,1001);
 insert into employees values(66928,"BLAZE","MANAGER",68319,"1991-05-01",2750.00,null,3001);
@@ -30,7 +30,7 @@ select salary from employees ;
 select distinct job_name from employees;
 select  emp_name ,concat("$", (salary+(salary*15)/100)) as salary from employees;
 select concat(emp_name,"  " ,job_name) as Employee$Job from employees ;
-select emp_id,emp_name,salary,date_format(hire_date,'%M %d %Y')from employees;
+select emp_id,emp_name,salary,date_format(hire_date,'%M %d %Y') as hire_date from employees;
 select length(emp_name) as length from employees;
 select emp_id,salary,commission from employees;
 select distinct dep_id,job_name from employees ;
@@ -41,14 +41,26 @@ select * from employees where emp_name="BLAZE";
 select  * from employees where (1.25*salary)>3000;
 select * from employees where  date_format(hire_date,"%M")="January";
 select emp_id,emp_name,hire_date,salary from employees where hire_date<"1991-04-01";
-select emp_name ,salary from employees where max(salary)=salary;
+SELECT e.emp_name,e.salary FROM employees e,salary_grade s
+WHERE e.emp_name = 'FRANK'AND e.salary BETWEEN s.min_salary AND s.max_salary
+AND e.salary = s.max_salary ;
 select * from employees where (job_name !="MANAGER")and (job_name!="PRESIDENT") order by salary;
 select max(salary) as highest from employees;
 select job_name,avg(salary),avg(salary+commission) from employees group by job_name;
-select emp_id ,emp_name,dep_id,job_name from employees where dep_id in(1001,2001);
-select manager_id ,count(emp_id) as count from employees  group by   manager_id  order by  manager_id;
+select e.emp_id,e.emp_name,e.dep_id,d.dep_location,d.dep_name
+from employees e,department d
+where e.dep_id = d.dep_id and e.dep_id in (1001,2001);
+select w.manager_id,count(*)
+from employees w,employees m
+where w.manager_id = m.emp_id
+group by  w.manager_id
+order by w.manager_id ASC;
 select dep_id ,count(emp_id) as count from employees group by dep_id having count(emp_id)>1;
 select * from employees where emp_name like "%AR%";
 Alter table employees add gender varchar(10);
+update employees set gender="male" where emp_id in (68319,66928,67832,69062,64989,65271,66564,68454,69324);
+update employees set gender="female" where emp_id in (65646,67858,69000,68736,63679);
+
+
 
 
